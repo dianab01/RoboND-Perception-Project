@@ -8,11 +8,11 @@
 [image3]: ./images/passthrough_filter.PNG
 [image4]: ./images/ransac.PNG
 [image5]: ./images/ransac_outlier_filter.PNG
-[image6]: ./images/word1_training.PNG
+[image6]: ./images/world1_training.PNG
 [image7]: ./images/world1_accuracy.PNG
 [image8]: ./images/world2_training.PNG
 [image9]: ./images/world2_accuracy.PNG
-[image10]: ./images/word3_training.PNG
+[image10]: ./images/world3_training.PNG
 [image11]: ./images/world3_accuracy.PNG
 [image12]: ./images/detected_1.PNG
 [image13]: ./images/detected_2.PNG
@@ -137,10 +137,9 @@ World 1                    |	World 2		                 |	World 3
 #### 2. Features extraction and SVM training.  Object recognition pipeline.
 The training and recognition was performed with histograms in the HSV color space, using around 50 positions of each object. In the three images below the training of the models was perfomed, the accuracy being around 95% in each case.
 
-![image5]	                 |  ![image7]
+![image6]	                 |  ![image7]
 :-------------------------:|:-------------------------:
 ![image8]	                 |  ![image9]
-:-------------------------:|:-------------------------:
 ![image10]	                |  ![image11]
 
 Regarding the recognition step, for each segmented object, HSV histogram was computed and was compared with the model corresponding to each world. In the first and second scenarios all the objects were correctly identified, whereas in the third world only 7 of the 8 were correct.
