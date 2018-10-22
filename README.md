@@ -130,23 +130,24 @@ cluster_indices = ec.Extract()
 
 Each object was represented using a different color, in each of the test worlds the following being obtained:
 
-![image15]                 | ![alt text][image16]      | ![image17]
+![image15]                 | ![image16]      | ![image17]
 :-------------------------:|:-------------------------:|:-------------------------:
 World 1                    |	World 2		                 |	World 3
 
 #### 2. Features extraction and SVM training.  Object recognition pipeline.
 The training and recognition was performed with histograms in the HSV color space, using around 50 positions of each object. In the three images below the training of the models was perfomed, the accuracy being around 95% in each case.
+For the normal histograms, the *bins_range* has been set to (-1;1) within the `features.py` file.
 
-![image6]	                 |  ![image7]
+![image6]	           |  ![image7]
 :-------------------------:|:-------------------------:
-![image8]	                 |  ![image9]
-![image10]	                |  ![image11]
+![image8]	           |  ![image9]
+![image10]	           |  ![image11]
 
 Regarding the recognition step, for each segmented object, HSV histogram was computed and was compared with the model corresponding to each world. In the first and second scenarios all the objects were correctly identified, whereas in the third world only 7 of the 8 were correct.
 
-![image12]                 | ![alt text][image13]      | ![image14]
+![image12]                 | ![image13]      	       | ![image14]
 :-------------------------:|:-------------------------:|:-------------------------:
-World 1                    |	World 2		                 |	World 3
+World 1                    |	World 2		       |	World 3
 
 
 ### Pick and Place Setup
@@ -170,7 +171,6 @@ In the end, information about the objects, such as name, computed centroid (spat
 The SVM models have an accuracy over 95%, being trained with histograms within the HSV color space rather than RGB and using 50 different positions in the feature capturing phase for each object. I have observed that using a considerably larger amount of positions did not reflect in the overall accuracy of the recognition.
 The main problems that arise in the detection and classification step is rather how the filters and clustering are performed. For this reason, in the third world scenario, where the glue if right in the back of the notebook, even though the object might be properly recognised, it is completely removed from the point cloud, being considered noise.
 In cases as such, a sequence of recognition steps, each separated by a rotation of the robot might be of significant help might be. Thus, the robor can have a wider view of the front scene.
-At the same time, a recognition process based only on color histograms might easily fail in the case of distinct objects that have approximately the same colors, which is why other more relevant features, such as shape or texture should be considered for a reliable detection.
 
 
 
