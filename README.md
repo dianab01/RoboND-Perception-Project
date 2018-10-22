@@ -1,9 +1,30 @@
 ## Project: Perception Pick & Place
 ### Third project implementation for the Udacity Robotics Software Engineer Nanodegree - 3D Perception for Pick and Place operation
 ---
+[//]: # (Image References)
 
+[image1]: ./images/outlier_filter_1.PNG
+[image2]: ./images/voxel_filter_1.PNG
+[image3]: ./images/passthrough_filter.PNG
+[image4]: ./images/ransac.PNG
+[image5]: ./images/ransac_outlier_filter.PNG
+[image6]: ./images/word1_training.PNG
+[image7]: ./images/world1_accuracy.PNG
+[image8]: ./images/world2_training.PNG
+[image9]: ./images/world2_accuracy.PNG
+[image10]: ./images/word3_training.PNG
+[image11]: ./images/world3_accuracy.PNG
+[image12]: ./images/detected_1.PNG
+[image13]: ./images/detected_2.PNG
+[image14]: ./images/detected_3.PNG
+[image15]: ./images/point_cloud_world_1.PNG
+[image16]: ./images/point_cloud_world_2.PNG
+[image17]: ./images/point_cloud_world_3.PNG
+[image18]: ./images/picked_object.PNG
+[image19]: ./images/raised_object.PNG
+[image20]: ./images/reached_place_box.PNG
 
-# The steps taken for completing the perceprion project:
+# The steps taken for completing the perception project:
 1. Clone the [project repo](https://github.com/udacity/RoboND-Perception-Project/) into the *catkin_ws* workspace, install missing dependencies (`rosdep install --from-paths src --ignore-src --rosdistro=kinetic -y`) and build the workspace (`catkin_make`)
 2. Train an SVM model on three set of objects, that will be present on three different setups (worlds) within the simulated environment.
 3. Subscribe to the ROS topic `/pr2/world/points` for receiving the point cloud from the PR2 robot depth camera, affected by noise.
@@ -15,34 +36,12 @@
 9. Request messages to the `pick_place_routine` service to plan the trajectory and make the robot move the objects in the corresponding box.
 10. Save information about the detected objects, such as name, pick and place positions and picking arm.
 
-[//]: # (Image References)
-[image1]:  ./images/outlier_filter_1.png
-[image2]:  ./images/voxel_filter_1.png
-[image3]:  ./images/passthrough_filter.png
-[image4]:  ./images/ransac.png
-[image5]:  ./images/ransac_outlier_filter.png
-[image6]:  ./images/word1_training.png
-[image7]:  ./images/world1_accuracy.png
-[image8]:  ./images/world2_training.png
-[image9]:  ./images/world2_accuracy.png
-[image10]:  ./images/word3_training.png
-[image11]: ./images/world3_accuracy.png
-[image12]: ./images/detected_1.png
-[image13]: ./images/detected_2.png
-[image14]: ./images/detected_3.png
-[image15]: ./images/point_cloud_world_1.png
-[image16]: ./images/point_cloud_world_2.png
-[image17]: ./images/point_cloud_world_3.png
-[image18]: ./images/picked_object.png
-[image19]: ./images/raised_object.png
-[image20]: ./images/reached_place_box.png
-
 ---
 ## Detailed steps taken
 
 #### 1. Pipeline for filtering and RANSAC plane.
 
-..* To the initial noisy point cloud, an outlier removal filter was applied, with the parameters of `4` *neighbouring points* and a *scale factor* of `0.0001`, the result being as in the below image:
+a. To the initial noisy point cloud, an outlier removal filter was applied, with the parameters of `4` *neighbouring points* and a *scale factor* of `0.0001`, the result being as in the below image:
 
 ```
 # Make statistical outlier filter
@@ -57,13 +56,13 @@ x = 0.0001
 cloud_filtered = outlier_filter.filter()
 ```
 
-![alt text][image1]
+![image1]
 
-..* Given that the point cloud is too dense, Voxel Downsampling technique was applied next, with a *voxel size* of `0.01` and the resulting point cloud can be observed in the image.
+b. Given that the point cloud is too dense, Voxel Downsampling technique was applied next, with a *voxel size* of `0.01` and the resulting point cloud can be observed in the image.
 
-![alt text][image2]
+![image2]
 
-..* Since there are multiple surfaces that are not of interest in the scene, a series of passthrough filters was then used, on the **z**, **x** as well as **y** axis, each keeping only the point from tthe given interval, delimited by `axis_min` and `axis_max`:
+c. Since there are multiple surfaces that are not of interest in the scene, a series of passthrough filters was then used, on the **z**, **x** as well as **y** axis, each keeping only the point from tthe given interval, delimited by `axis_min` and `axis_max`:
 
 ```
 ###     PassThrough Filter along z
@@ -98,15 +97,15 @@ cloud_filtered = passthrough.filter()
 ```
 
 A point cloud similar to the one below was obtained.
-![alt text][image3]
+![image3]
 
-..* RANSAC plane segnentation was implemented, which fitted the model for the table. By extracting the negative of it, the objects were obtained, as in the image below:
+d. RANSAC plane segnentation was implemented, which fitted the model for the table. By extracting the negative of it, the objects were obtained, as in the image below:
 
-![alt text][image4]
+![image4]
 
 Since there were still some remaining points part of the table applying an additional outlier removal filter, the remaied points part of the table were removed, leaving the working point cloud as it follows:
 
-![alt text][image5]
+![image5]
 
 #### 2. Pipeline for clustering.  
 The DBSCAN Algorithm, or Euclidian Clustering was used to perform the segmentention in distinct objects from the above filtered point cloud, which is based only on the spatial distance between two points in order to decide their belonging. As described in the section below, the cluster tolerance was set to 0.02, while the size of the cluster was between 100 and 1500 points.
@@ -131,36 +130,36 @@ cluster_indices = ec.Extract()
 
 Each object was represented using a different color, in each of the test worlds the following being obtained:
 
-![alt text][image15] ![alt text][image16] ![alt text][image17]
+![image15] ![alt text][image16] ![image17]
 World 1		|	World 2		|	World 3
 
 #### 2. Features extraction and SVM training.  Object recognition pipeline.
 The training and recognition was performed using histograms in the HSV color space, using around 50 positions of each object. In the three images below the training of the models was perfomed, the accuracy being around 95% in each case.
 
-![alt text][image5]	![alt text][image7]
+![image5]	![image7]
 
-![alt text][image8]	![alt text][image9]
+![image8]	![image9]
 
-![alt text][image10]	![alt text][image11]
+![image10]	![image11]
 
 As for the recognition step, for each segmented object, HSV histogram was computed and it was compared with the model corresponding to each world. In the first and second scenarios all the objects were correctly identified, as in the following two pictures, whereas in the third world, only seven of the 8 were identified.
 
-![alt text][image12]
-![alt text][image13]
-![alt text][image14]
+![image12]
+![image13]
+![image14]
 
 
 ### Pick and Place Setup
 
 For all three tabletop setups (`test*.world`), object recognition was perfomed by reading the corresponding `pick_list_*.yaml` file. Consequently, a request to the `PickPlace` service was perfomed, so that the object is placed in the associated box.
 
-![alt text][image18]
+![image18]
 **Object being grasped by PR2 robot on the table**
 
-![alt text][image19]
+![image19]
 **Object being picked by PR2 robot from the table**
 
-![alt text][image20]
+![image20]
 **PR2 reached target box with the object**
 
 In the end, information about the objects, such as its name, computed centroid (spatial average of its points along the axis), arm to be raised with, etc. is output them to the `output_*.yaml` file.
