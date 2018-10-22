@@ -130,8 +130,9 @@ cluster_indices = ec.Extract()
 
 Each object was represented using a different color, in each of the test worlds the following being obtained:
 
-![image15] ![alt text][image16] ![image17]
-World 1		|	World 2		|	World 3
+![image15]                 | ![alt text][image16]      | ![image17]
+:-------------------------:|:-------------------------:|:-------------------------:
+World 1                    |	World 2		                 |	World 3
 
 #### 2. Features extraction and SVM training.  Object recognition pipeline.
 The training and recognition was performed using histograms in the HSV color space, using around 50 positions of each object. In the three images below the training of the models was perfomed, the accuracy being around 95% in each case.
